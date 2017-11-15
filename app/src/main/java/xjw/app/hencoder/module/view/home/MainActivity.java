@@ -14,6 +14,7 @@ import xjw.app.hencoder.R;
 import xjw.app.hencoder.base.BaseActivity;
 import xjw.app.hencoder.module.view.ble.BleActivity;
 import xjw.app.hencoder.module.view.custom.CustomActivity;
+import xjw.app.hencoder.module.view.videos.VideoSaveActivity;
 
 public class MainActivity extends BaseActivity {
 
@@ -60,7 +61,7 @@ public class MainActivity extends BaseActivity {
                 "2017-11-14 10:28:05", "持续:1天",R.mipmap.img_05));
         beanData.add(new MainRvBean("视频录制",
                 "视频录制模块,录制视频存储到本地",
-                "2017-8-15 11:27:25", "持续:1天",R.mipmap.img_06));
+                "2017-11-15 09:53:04", "持续:1天",R.mipmap.img_06));
     }
 
     private void check(int id, int tag) {
@@ -72,6 +73,7 @@ public class MainActivity extends BaseActivity {
                 startActivity(new Intent(MainActivity.this, BleActivity.class));
                 break;
             case 3://视频录制
+                startActivity(new Intent(MainActivity.this, VideoSaveActivity.class));
                 break;
         }
     }

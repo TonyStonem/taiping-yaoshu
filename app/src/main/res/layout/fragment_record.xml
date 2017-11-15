@@ -1,0 +1,116 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#232323"
+                android:keepScreenOn="true"
+                android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:id="@+id/rel_recorder_video"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:id="@+id/rel_take"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_alignParentBottom="true"
+                android:background="@android:color/transparent">
+
+                <TextView
+                    android:id="@+id/text_record_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="10dp"
+                    android:textColor="@android:color/white"
+                    tools:text="20s"/>
+
+                <ImageView
+                    android:id="@+id/img_record"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_margin="5dp"
+                    android:src="@mipmap/ic_launcher"/>
+            </RelativeLayout>
+
+            <SurfaceView
+                android:id="@+id/surface_recorder"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@id/rel_take"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/rel_play_video"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#232323"
+            android:visibility="gone">
+
+
+            <ImageView
+                android:id="@+id/img_reset"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_alignParentBottom="true"
+                android:layout_centerInParent="true"
+                android:layout_margin="10dp"
+                android:src="@mipmap/ic_launcher"/>
+
+            <SurfaceView
+                android:id="@+id/surface_play_video"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@id/img_reset"/>
+
+            <ImageView
+                android:id="@+id/img_play"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="220dp"
+                android:src="@mipmap/ic_launcher"/>
+        </RelativeLayout>
+    </FrameLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="47dp"
+        android:background="#50232323"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp">
+
+        <ImageView
+            android:id="@+id/img_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:padding="4dp"
+            android:src="@mipmap/ic_launcher"/>
+
+        <TextView
+            android:textSize="@dimen/sp17"
+            android:text="Shipin"
+            android:layout_centerInParent="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <ImageView
+            android:id="@+id/img_send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:padding="4dp"
+            android:src="@mipmap/ic_launcher"/>
+    </RelativeLayout>
+</RelativeLayout>
