@@ -84,7 +84,7 @@ public abstract class BaseActivity extends AppCompatActivity
 
     protected abstract void start(Bundle savedInstanceState);
 
-    public void cancelLoadDia(boolean force) {
+    private void cancelLoadDia(boolean force) {
         if (force) loadDialogCount = 0;
         loadDialogCount--;
         if (loadDialogCount <= 0 && loadDialog != null) loadDialog.cancel();

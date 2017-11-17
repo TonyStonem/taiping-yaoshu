@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -12,11 +13,18 @@ import java.util.List;
 import butterknife.BindView;
 import xjw.app.hencoder.R;
 import xjw.app.hencoder.base.BaseActivity;
+import xjw.app.hencoder.http.AllUrl;
 import xjw.app.hencoder.module.view.ble.BleActivity;
 import xjw.app.hencoder.module.view.custom.CustomActivity;
+import xjw.app.hencoder.module.view.glide.GlidePlayActivity;
 import xjw.app.hencoder.module.view.videos.VideoSaveActivity;
+import xjw.app.hencoder.utils.OkHttpManager;
+import xjw.app.hencoder.utils.UIUtils;
 
 public class MainActivity extends BaseActivity {
+
+    public static final String USERNAME = "xjwStudio";
+    public static final String PASSWORD = "admin";
 
     private View.OnClickListener myRvItemListener = new View.OnClickListener() {
         @Override
@@ -37,8 +45,38 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void start(Bundle savedInstanceState) {
+        signIn();
         initData();
         initView();
+    }
+
+    private void signIn() {
+        showLoadDias();
+        String url = AllUrl.GET_SIGN_IN + USERNAME + "&pswd=" + PASSWORD;
+        OkHttpManager.get(url
+                , this, new OkHttpManager.OnResponse<String>() {
+                    @Override
+                    public String analyseResult(String result) {
+                        cancelLoadDialogs();
+                        return result;
+                    }
+
+                    @Override
+                    public void onFailed(int code, String msg, String url) {
+                        super.onFailed(code, msg, url);
+                        cancelLoadDialogs();
+                    }
+
+                    @Override
+                    public void onSuccess(String s) {
+                        if (TextUtils.isEmpty(s)) {
+                            UIUtils.showToast("登录失败");
+                            return;
+                        }
+                        UIUtils.showToast(s);
+                        System.out.println(s);
+                    }
+                });
     }
 
     private void initView() {
@@ -52,16 +90,19 @@ public class MainActivity extends BaseActivity {
     private void initData() {
         beanData.add(new MainRvBean("自定义View",
                 "自定义view的学习笔记",
-                "2017-8-15 11:27:25", "持续:1天",R.mipmap.img_01));
+                "2017-8-15 11:27:25", "持续:1天", R.mipmap.img_01));
         beanData.add(new MainRvBean("j2ee_note",
                 "J2ee的一个学习笔记",
-                "2017-8-17 10:51:41", "持续:1天",R.mipmap.img_04));
+                "2017-8-17 10:51:41", "持续:1天", R.mipmap.img_04));
         beanData.add(new MainRvBean("蓝牙模块",
                 "蓝牙模块,扫描搜索周围蓝牙进行连接及数据交互",
-                "2017-11-14 10:28:05", "持续:1天",R.mipmap.img_05));
+                "2017-11-14 10:28:05", "持续:1天", R.mipmap.img_05));
         beanData.add(new MainRvBean("视频录制",
                 "视频录制模块,录制视频存储到本地",
-                "2017-11-15 09:53:04", "持续:1天",R.mipmap.img_06));
+                "2017-11-15 09:53:04", "持续:1天", R.mipmap.img_06));
+        beanData.add(new MainRvBean("Glide Play",
+                "模仿商城图片列表,使用Glide加载",
+                "2017-11-17 09:37:34", "持续:1天", R.mipmap.img_06));
     }
 
     private void check(int id, int tag) {
@@ -74,6 +115,9 @@ public class MainActivity extends BaseActivity {
                 break;
             case 3://视频录制
                 startActivity(new Intent(MainActivity.this, VideoSaveActivity.class));
+                break;
+            case 4://Glide
+                startActivity(new Intent(MainActivity.this, GlidePlayActivity.class));
                 break;
         }
     }
