@@ -17,6 +17,7 @@ import xjw.app.hencoder.http.AllUrl;
 import xjw.app.hencoder.module.view.ble.BleActivity;
 import xjw.app.hencoder.module.view.custom.CustomActivity;
 import xjw.app.hencoder.module.view.glide.GlidePlayActivity;
+import xjw.app.hencoder.module.view.laif.LaiFActivity;
 import xjw.app.hencoder.module.view.videos.VideoSaveActivity;
 import xjw.app.hencoder.utils.OkHttpManager;
 import xjw.app.hencoder.utils.UIUtils;
@@ -103,6 +104,9 @@ public class MainActivity extends BaseActivity {
         beanData.add(new MainRvBean("Glide Play",
                 "模仿商城图片列表,使用Glide加载",
                 "2017-11-17 09:37:34", "持续:1天", R.mipmap.img_06));
+        beanData.add(new MainRvBean("来疯直播",
+                "学习 来疯直播 的直播模块.",
+                "2017-11-20 10:02:08", "持续:1天", R.mipmap.img_06));
     }
 
     private void check(int id, int tag) {
@@ -118,6 +122,9 @@ public class MainActivity extends BaseActivity {
                 break;
             case 4://Glide
                 startActivity(new Intent(MainActivity.this, GlidePlayActivity.class));
+                break;
+            case 5://直播
+                startActivity(new Intent(MainActivity.this, LaiFActivity.class));
                 break;
         }
     }
