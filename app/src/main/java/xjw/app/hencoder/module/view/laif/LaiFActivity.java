@@ -7,6 +7,8 @@ import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -24,6 +26,24 @@ import xjw.app.hencoder.module.view.laif.bean.CameraData;
 
 public class LaiFActivity extends BaseActivity {
 
+    //TODO 设置手势缩放
+    private class MyZoomGestureListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+        @Override
+        public boolean onScale(ScaleGestureDetector detector) {
+            //TODO 当前一些状态的判断
+            float i = 0;
+            if (detector.getScaleFactor() > 1.0f) {
+                i = cameraZoom(true);//放大
+            } else if (detector.getScaleFactor() < 1.0f) {
+                i = cameraZoom(false);//缩小
+            } else {
+                return false;
+            }
+            System.out.println("scale >> " + i);
+            return true;
+        }
+    }
+
     private Camera.PreviewCallback previewCallback = new Camera.PreviewCallback() {
         @Override
         public void onPreviewFrame(byte[] data, Camera camera) {
@@ -38,6 +58,8 @@ public class LaiFActivity extends BaseActivity {
     private CameraData mBean;
     private List<CameraData> cameraList = new ArrayList<>();
     private Camera mCameraDevice;
+
+    private ScaleGestureDetector mZoomGestureDetector;
 
     @Override
     protected int getLayoutID() {
@@ -54,6 +76,7 @@ public class LaiFActivity extends BaseActivity {
             //TODO 权限检测
             cameraList = getAllCamerasData(false);
             try {
+                //TODO 使用标记记录当前摄像头的状态(INIT,OPENED,PREVIEW)
                 openCamera();
             } catch (CameraNotSupportException e) {
                 e.printStackTrace();
@@ -62,7 +85,7 @@ public class LaiFActivity extends BaseActivity {
     }
 
     private void initView() {
-
+        mZoomGestureDetector = new ScaleGestureDetector(this, new MyZoomGestureListener());
         svLaif.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
@@ -137,15 +160,66 @@ public class LaiFActivity extends BaseActivity {
         setCameraFps();
         //TODO 设置对焦方式
         setAutoFocusMode();
+//        setTouchFocusMode();
 
         return mCameraDevice;
     }
 
+    private float cameraZoom(boolean b) {
+        //TODO 一些标记状态判断
+        if (mCameraDevice == null || mBean == null) {
+            return -1;
+        }
+        Camera.Parameters parameters = mCameraDevice.getParameters();
+        if (b) {
+            parameters.setZoom(Math.min(parameters.getZoom() + 1, parameters.getMaxZoom()));
+        } else {
+            parameters.setZoom(Math.max(parameters.getZoom() - 1, 0));
+        }
+        mCameraDevice.setParameters(parameters);
+        return (float) parameters.getZoom() / parameters.getMaxZoom();
+    }
+
     /**
-     * 设置对焦方式
+     * 设置手动对焦方式
+     */
+    private void setTouchFocusMode() {
+        //TODO 准确设置对焦区域
+        // 1.获取当前点击坐标位置
+        // 2.通过点击坐标位置转换到摄像头预览界面坐标体系的坐标
+        // 3.根据坐标生成对焦区并且设置给摄像头
+        try {
+            Camera.Parameters parameters = mCameraDevice.getParameters();
+            List<String> modes = parameters.getSupportedFocusModes();
+            if (modes != null && modes.size() > 0 && modes.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
+                parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+                mCameraDevice.setParameters(parameters);
+            } else if (modes != null && modes.size() > 0) {
+                parameters.setFocusMode(modes.get(0));
+                mCameraDevice.setParameters(parameters);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 设置自动对焦方式
      */
     private void setAutoFocusMode() {
-
+        try {
+            Camera.Parameters parameters = mCameraDevice.getParameters();
+            List<String> modes = parameters.getSupportedFocusModes();
+            if (modes != null && modes.size() > 0 && modes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
+                parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+                mCameraDevice.setParameters(parameters);
+            } else if (modes != null && modes.size() > 0) {
+                parameters.setFocusMode(modes.get(0));
+                mCameraDevice.setParameters(parameters);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -316,6 +390,12 @@ public class LaiFActivity extends BaseActivity {
             System.out.println("当前设备不支持摄像头 >> checkDiv()");
         }
         return b;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        //TODO 判断手动聚焦时的状态
+        return mZoomGestureDetector.onTouchEvent(event);
     }
 
     @Override
