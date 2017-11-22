@@ -2,19 +2,37 @@ package xjw.app.hencoder.module.view.laif;
 
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 
 import com.laifeng.sopcastsdk.camera.exception.CameraNotSupportException;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
 import xjw.app.hencoder.R;
 import xjw.app.hencoder.base.BaseActivity;
 import xjw.app.hencoder.module.view.laif.bean.CameraData;
 
 public class LaiFActivity extends BaseActivity {
+
+    private Camera.PreviewCallback previewCallback = new Camera.PreviewCallback() {
+        @Override
+        public void onPreviewFrame(byte[] data, Camera camera) {
+            //需将NV21转为I420格式 然后交给x264编码库 如果是硬编 安卓支持I420和NV12
+
+        }
+    };
+
+    @BindView(R.id.sv_laif)
+    SurfaceView svLaif;
 
     private CameraData mBean;
     private List<CameraData> cameraList = new ArrayList<>();
@@ -27,14 +45,60 @@ public class LaiFActivity extends BaseActivity {
 
     @Override
     protected void start(Bundle savedInstanceState) {
-        if (checkDiv()) return;
-        //TODO 权限检测
-        cameraList = getAllCamerasData(true);
-        try {
-            openCamera();
-        } catch (CameraNotSupportException e) {
-            e.printStackTrace();
+        initView();
+    }
+
+    private void initCamera() {
+        if (!checkDiv()) {
+            //TODO 权限检测
+            cameraList = getAllCamerasData(false);
+            try {
+                openCamera();
+            } catch (CameraNotSupportException e) {
+                e.printStackTrace();
+            }
         }
+    }
+
+    private void initView() {
+
+        svLaif.getHolder().addCallback(new SurfaceHolder.Callback() {
+            @Override
+            public void surfaceCreated(SurfaceHolder holder) {
+                if (holder == null) {
+                    return;
+                }
+                if (mCameraDevice == null) {
+                    initCamera();
+                }
+                try {
+                    mCameraDevice.setPreviewDisplay(holder);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                mCameraDevice.startPreview();
+            }
+
+            @Override
+            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+                if (holder == null) {
+                    return;
+                }
+                mCameraDevice.stopPreview();
+                try {
+                    mCameraDevice.setPreviewDisplay(holder);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                mCameraDevice.startPreview();
+            }
+
+            @Override
+            public void surfaceDestroyed(SurfaceHolder holder) {
+
+            }
+        });
+
     }
 
     /**
@@ -63,8 +127,55 @@ public class LaiFActivity extends BaseActivity {
             throw new CameraNotSupportException();
         }
         //TODO 初始化摄像头参数
+        initCameraParameters();
+        //TODO 图像旋转
         mBean = bean;
         return mCameraDevice;
+    }
+
+    /**
+     * 初始化摄像头参数
+     */
+    private void initCameraParameters() {
+        //设置预览回调的图片格式 Android推荐的PreView Format时NV21
+        Camera.Parameters parameters = mCameraDevice.getParameters();
+        parameters.setPreviewFormat(ImageFormat.NV21);
+        /* 设置预览图像大小 */
+        Camera.Size optimalSize = null;
+        DisplayMetrics metrics = Resources.getSystem().getDisplayMetrics();
+        int screenWidth = metrics.widthPixels;
+        int screenHeight = metrics.heightPixels;
+        double minWidthDiff = Double.MAX_VALUE;
+        double minHeightDiff = Double.MAX_VALUE;
+        List<Camera.Size> sizes = parameters.getSupportedPreviewSizes();
+        if (sizes != null && sizes.size() > 0) {
+            //找到宽度差距最小的
+            for (Camera.Size size :
+                    sizes) {
+                if (Math.abs(size.width - screenWidth) < minWidthDiff) {
+                    minWidthDiff = Math.abs(size.width - screenWidth);
+                    System.out.println("minWidthDiff >> " + minWidthDiff);
+                }
+            }
+            //在宽度差距最小的里面 找到高度差距最小的
+            for (Camera.Size size :
+                    sizes) {
+                if (Math.abs(size.width - screenWidth) == minWidthDiff){
+                    if (Math.abs(size.height - screenHeight) < minHeightDiff){
+                        optimalSize = size;
+                        minHeightDiff = Math.abs(size.height - screenHeight);
+                    }
+                }
+            }
+        }
+        //TODO 测试
+        svLaif.getLayoutParams().height = optimalSize.height;
+        svLaif.getLayoutParams().width = optimalSize.width;
+
+        parameters.setPreviewSize(optimalSize.width, optimalSize.height);
+        mCameraDevice.setParameters(parameters);
+        //预览回调的callback 在PreviewCallback中会返回Preview的N21图片
+        mCameraDevice.setPreviewCallback(previewCallback);
     }
 
     /**

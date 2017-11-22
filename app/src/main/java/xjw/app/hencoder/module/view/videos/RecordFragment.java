@@ -26,7 +26,7 @@ import xjw.app.hencoder.R;
 import xjw.app.hencoder.base.BaseFragment;
 
 /**
- * Created by Q on 2016/6/2.
+ * Created by Q on 2015/9/2.
  */
 public class RecordFragment extends BaseFragment {
     // 存放录制录制的视频的路径

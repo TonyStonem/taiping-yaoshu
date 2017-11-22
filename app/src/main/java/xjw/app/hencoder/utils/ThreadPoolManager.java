@@ -72,7 +72,8 @@ public class ThreadPoolManager {
                 //keepAliveTime
 
                 threadPool = new ThreadPoolExecutor(corePoolSize, maximumPoolSize,
-                        keepAliveTime, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(10));
+                        keepAliveTime, TimeUnit.MILLISECONDS,
+                        new LinkedBlockingQueue<Runnable>(10));
             }
 
             threadPool.execute(runnable);

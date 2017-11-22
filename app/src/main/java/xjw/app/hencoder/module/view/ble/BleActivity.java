@@ -93,6 +93,8 @@ public class BleActivity extends BaseActivity {
             }
         }
     };
+    private ArrayList<ArrayList<BluetoothGattCharacteristic>> mGattCharacteristics;
+    private String uuid;
 
     @Override
     protected int getLayoutID() {
@@ -141,7 +143,7 @@ public class BleActivity extends BaseActivity {
             }
             if (Build.VERSION.SDK_INT <= 22) {
                 bluetoothAdapter.startLeScan(scanCallback);
-            }else {
+            } else {
                 BluetoothLeScanner scanner =
                         bluetoothAdapter.getBluetoothLeScanner();
                 scanner.startScan(scanCallbackMax);
@@ -154,7 +156,7 @@ public class BleActivity extends BaseActivity {
         if (bluetoothAdapter != null) {
             if (Build.VERSION.SDK_INT <= 22) {
                 bluetoothAdapter.stopLeScan(scanCallback);
-            }else {
+            } else {
                 BluetoothLeScanner scanner =
                         bluetoothAdapter.getBluetoothLeScanner();
                 scanner.stopScan(scanCallbackMax);
@@ -192,6 +194,7 @@ public class BleActivity extends BaseActivity {
             @Override
             public void onSimpleItemClick(BaseQuickAdapter adapter, View view, int position) {
                 BluetoothDevice device = devices.get(position);
+                System.out.println("开始连接 >> " + device.getAddress());
                 //进行蓝牙连接
                 device.connectGatt(BleActivity.this, false, new BluetoothGattCallback() {
 
@@ -229,7 +232,7 @@ public class BleActivity extends BaseActivity {
                      */
                     public void onServicesDiscovered(BluetoothGatt gatt, int status) {
 
-                        System.out.println("发现服务");
+                        System.out.println("发现服务 >> " + gatt.getServices());
 
                     }
 
@@ -257,6 +260,7 @@ public class BleActivity extends BaseActivity {
                                 gatt.discoverServices();
                                 System.out.println("连接成功");
                             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                                System.out.println("连接关闭");
                                 gatt.close();
                             }
                         } else {
@@ -283,4 +287,6 @@ public class BleActivity extends BaseActivity {
 //            startScan();
         }
     }
+
+
 }
