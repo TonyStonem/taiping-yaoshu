@@ -128,11 +128,49 @@ public class LaiFActivity extends BaseActivity {
             throw new CameraNotSupportException();
         }
         mBean = bean;
+
         //TODO 初始化摄像头参数
         setCameraParameters();
         //TODO 图像旋转
         setViewRota();
+        //TODO 设置预览帧率
+        setCameraFps();
+        //TODO 设置对焦方式
+        setAutoFocusMode();
+
         return mCameraDevice;
+    }
+
+    /**
+     * 设置对焦方式
+     */
+    private void setAutoFocusMode() {
+
+    }
+
+    /**
+     * 设置预览帧率
+     * Oppo和Vivo的前置摄像头，当fps不为15的时候，在弱光环境下预览图像会很黑。
+     */
+    private void setCameraFps() {
+        int expectedFps = 15;
+        Camera.Parameters parameters = mCameraDevice.getParameters();
+        expectedFps *= 1000;
+        //摄像头帧率变化范围
+        List<int[]> ints = parameters.getSupportedPreviewFpsRange();
+        int[] closestRange = ints.get(0);
+        int measure = Math.abs(closestRange[0] - expectedFps) + Math.abs(closestRange[1] - expectedFps);
+        for (int[] range : ints) {
+            if (range[0] <= expectedFps && range[1] >= expectedFps) {
+                int curMeasure = Math.abs(range[0] - expectedFps) + Math.abs(range[1] - expectedFps);
+                if (curMeasure < measure) {
+                    closestRange = range;
+                    measure = curMeasure;
+                }
+            }
+        }
+        parameters.setPreviewFpsRange(closestRange[0], closestRange[1]);
+        mCameraDevice.setParameters(parameters);
     }
 
     /**

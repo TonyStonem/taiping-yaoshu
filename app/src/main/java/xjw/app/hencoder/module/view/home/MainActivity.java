@@ -104,8 +104,8 @@ public class MainActivity extends BaseActivity {
         beanData.add(new MainRvBean("Glide Play",
                 "模仿商城图片列表,使用Glide加载",
                 "2017-11-17 09:37:34", "持续:1天", R.mipmap.img_06));
-        beanData.add(new MainRvBean("来疯直播",
-                "学习 来疯直播 的直播模块.",
+        beanData.add(new MainRvBean("xjwLive",
+                "搞个直播玩玩,喵喵喵.",
                 "2017-11-20 10:02:08", "持续:1天", R.mipmap.img_06));
     }
 
