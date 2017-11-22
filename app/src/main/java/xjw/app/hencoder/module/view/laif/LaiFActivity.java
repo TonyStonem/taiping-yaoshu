@@ -7,6 +7,7 @@ import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -126,17 +127,56 @@ public class LaiFActivity extends BaseActivity {
             System.out.println("摄像头不可用 >> mCameraDevice == null");
             throw new CameraNotSupportException();
         }
-        //TODO 初始化摄像头参数
-        initCameraParameters();
-        //TODO 图像旋转
         mBean = bean;
+        //TODO 初始化摄像头参数
+        setCameraParameters();
+        //TODO 图像旋转
+        setViewRota();
         return mCameraDevice;
+    }
+
+    /**
+     * 图像旋转 要根据当前应用的屏幕旋转情况实时调整摄像头角度
+     * 1.通过摄像头的setDisplayOrientation(result)方法
+     * 2.通过OpenGL的矩阵进行旋转
+     */
+    private void setViewRota() {
+        int result;
+        int rotation = getWindowManager().getDefaultDisplay().getRotation();
+        switch (rotation) {
+            case Surface.ROTATION_0:
+                rotation = 0;
+                break;
+            case Surface.ROTATION_90:
+                rotation = 90;
+                break;
+            case Surface.ROTATION_180:
+                rotation = 180;
+                break;
+            case Surface.ROTATION_270:
+                rotation = 270;
+                break;
+        }
+        rotation = 0;
+        Camera.CameraInfo info = new Camera.CameraInfo();
+        Camera.getCameraInfo(mBean.cameraID, info);
+        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            result = (info.orientation + rotation) % 360;
+            result = (360 - result) % 360;
+        }
+//        else if (info.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
+//            result = (info.orientation - rotation + 360) % 360;
+//        }
+        else {
+            result = (info.orientation - rotation + 360) % 360;
+        }
+        mCameraDevice.setDisplayOrientation(result);
     }
 
     /**
      * 初始化摄像头参数
      */
-    private void initCameraParameters() {
+    private void setCameraParameters() {
         //设置预览回调的图片格式 Android推荐的PreView Format时NV21
         Camera.Parameters parameters = mCameraDevice.getParameters();
         parameters.setPreviewFormat(ImageFormat.NV21);
@@ -160,8 +200,8 @@ public class LaiFActivity extends BaseActivity {
             //在宽度差距最小的里面 找到高度差距最小的
             for (Camera.Size size :
                     sizes) {
-                if (Math.abs(size.width - screenWidth) == minWidthDiff){
-                    if (Math.abs(size.height - screenHeight) < minHeightDiff){
+                if (Math.abs(size.width - screenWidth) == minWidthDiff) {
+                    if (Math.abs(size.height - screenHeight) < minHeightDiff) {
                         optimalSize = size;
                         minHeightDiff = Math.abs(size.height - screenHeight);
                     }
@@ -169,8 +209,8 @@ public class LaiFActivity extends BaseActivity {
             }
         }
         //TODO 测试
-        svLaif.getLayoutParams().height = optimalSize.height;
-        svLaif.getLayoutParams().width = optimalSize.width;
+//        svLaif.getLayoutParams().height = optimalSize.height;
+//        svLaif.getLayoutParams().width = optimalSize.width;
 
         parameters.setPreviewSize(optimalSize.width, optimalSize.height);
         mCameraDevice.setParameters(parameters);
