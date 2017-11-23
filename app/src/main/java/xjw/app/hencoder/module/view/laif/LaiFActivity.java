@@ -1,11 +1,16 @@
 package xjw.app.hencoder.module.view.laif;
 
+import android.Manifest;
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -68,12 +73,13 @@ public class LaiFActivity extends BaseActivity {
 
     @Override
     protected void start(Bundle savedInstanceState) {
+        //TODO 权限检测
+        checkP();
         initView();
     }
 
     private void initCamera() {
         if (!checkDiv()) {
-            //TODO 权限检测
             cameraList = getAllCamerasData(false);
             try {
                 //TODO 使用标记记录当前摄像头的状态(INIT,OPENED,PREVIEW)
@@ -82,6 +88,31 @@ public class LaiFActivity extends BaseActivity {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void checkP() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED) {
+
+        } else {
+                ActivityCompat.requestPermissions(this, new String[]
+                        {Manifest.permission.CAMERA}, 100);
+        }
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        if (requestCode == 100) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                System.out.println("权限允许 onRequestPermissionsResult");
+            }else {
+                System.out.println("权限拒绝 onRequestPermissionsResult");
+            }
+        }
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     private void initView() {

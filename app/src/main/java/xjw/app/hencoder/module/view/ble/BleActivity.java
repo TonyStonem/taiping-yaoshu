@@ -11,8 +11,10 @@ import android.bluetooth.BluetoothProfile;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,12 +34,25 @@ import com.chad.library.adapter.base.listener.OnItemClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import butterknife.BindView;
 import xjw.app.hencoder.R;
 import xjw.app.hencoder.base.BaseActivity;
 
 public class BleActivity extends BaseActivity {
+
+    private MyScanModeChanged myScanModeChanged;
+
+    //监听 本地设备被其他设备发现 状态改变
+    private class MyScanModeChanged extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+
+        }
+    }
+
     private BluetoothAdapter.LeScanCallback scanCallback = new BluetoothAdapter.LeScanCallback() {
 
         @Override
@@ -71,6 +86,7 @@ public class BleActivity extends BaseActivity {
 
     private static final int REQUEST_ENABLE_BT = 100;
     private static final int REQUEST_ENABLE_GPS = 101;
+    private static final int REQUEST_OPEN_BLE = 102;
 
     private List<BluetoothDevice> devices = new ArrayList<>();
     private boolean canScan = true;
@@ -105,6 +121,15 @@ public class BleActivity extends BaseActivity {
     protected void start(Bundle savedInstanceState) {
         initView();
         startScan();
+        //让本地设备被其他设备发现 如果此时Bluetooth没有启用 会自动开启Bluetooth
+        Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+        intent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 0);
+        startActivityForResult(intent, REQUEST_OPEN_BLE);
+        myScanModeChanged = new MyScanModeChanged();
+
+        IntentFilter filter = new IntentFilter();
+
+        registerReceiver(myScanModeChanged, filter);
     }
 
     private void useScan() {
@@ -148,12 +173,21 @@ public class BleActivity extends BaseActivity {
                         bluetoothAdapter.getBluetoothLeScanner();
                 scanner.startScan(scanCallbackMax);
             }
+            //已配对的设备
+            Set<BluetoothDevice> set = bluetoothAdapter.getBondedDevices();
+            if (set != null && set.size() > 0) {
+                for (BluetoothDevice dev :
+                        set) {
+                    devices.add(dev);
+                    System.out.println(dev.getName() + " >> " + dev.getAddress());
+                }
+            }
             System.out.println("start scan.");
             //15s后关闭扫描
             mHandler.sendEmptyMessageDelayed(0, 15 * 1000);
             return;
         }
-        if (bluetoothAdapter != null) {
+        if (bluetoothAdapter != null && bluetoothAdapter.isEnabled()) {
             if (Build.VERSION.SDK_INT <= 22) {
                 bluetoothAdapter.stopLeScan(scanCallback);
             } else {
@@ -167,6 +201,7 @@ public class BleActivity extends BaseActivity {
 
     private boolean checkUsedBleAndIsOpen() {
         //TODO 权限检测
+        //manager.getAdapter 内部其实还是BluetoothAdapter.getDefaultAdapter();
         BluetoothManager manager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         bluetoothAdapter = manager.getAdapter();
         if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
@@ -277,14 +312,31 @@ public class BleActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         canScan = false;
+        if (myScanModeChanged != null) {
+            unregisterReceiver(myScanModeChanged);
+        }
         blueScan();
         super.onDestroy();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_ENABLE_BT) {
-//            startScan();
+        switch (requestCode) {
+            case REQUEST_ENABLE_BT:
+                if (resultCode == RESULT_OK) {
+                    System.out.println("bt 可用 >> ok");
+                    startScan();
+                } else if (resultCode == RESULT_CANCELED) {
+                    System.out.println("bt 不可用 >> canceled");
+                }
+                break;
+            case REQUEST_OPEN_BLE:
+                if (resultCode == RESULT_OK) {
+                    System.out.println("bt 被发现 >> ok");
+                } else if (resultCode == RESULT_CANCELED) {
+                    System.out.println("bt 被发现 >> canceled");
+                }
+                break;
         }
     }
 
