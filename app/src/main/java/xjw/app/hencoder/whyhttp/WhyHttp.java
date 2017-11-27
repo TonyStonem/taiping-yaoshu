@@ -47,8 +47,13 @@ public class WhyHttp {
         ThreadUtils.runOnBackThread(new Runnable() {
             @Override
             public void run() {
-                String result = get(url);
-                response.onSuccess(result);
+                final String result = get(url);
+                ThreadUtils.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        response.onSuccess(result);
+                    }
+                });
             }
         });
     }
@@ -85,8 +90,13 @@ public class WhyHttp {
         ThreadUtils.runOnBackThread(new Runnable() {
             @Override
             public void run() {
-                String result = post(url, data);
-                response.onSuccess(result);
+                final String result = post(url, data);
+                ThreadUtils.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        response.onSuccess(result);
+                    }
+                });
             }
         });
     }

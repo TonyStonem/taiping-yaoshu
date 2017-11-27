@@ -56,7 +56,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void signIn4WhyHttp() {
-        String json = WhyHttp.create().get(mSignIn);
+//        String json = WhyHttp.create().get(mSignIn);
         WhyHttp.create().get(mSignIn, new WhyHttp.OnResponse() {
 
             @Override
