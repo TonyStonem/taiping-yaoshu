@@ -42,7 +42,79 @@ import xjw.app.hencoder.utils.UIUtils;
 
 public class BleActivity extends BaseActivity {
 
-    private MyScanModeChanged myScanModeChanged;
+    private BluetoothGattCallback bluetoothGattCallback = new BluetoothGattCallback() {
+
+        @Override
+        public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+//往蓝牙数据通道的写入数据
+//                        BluetoothGattService service = gatt.getService(SERVICE_UUID);
+//                        BluetoothGattCharacteristic characteristic = gatt.getCharacteristic(CHARACTER_UUID);
+//                        characteristic.setValue(sendValue);
+//                        gatt.writeCharacteristic(characteristic);
+//                        if (!characteristic.getValue().equal(sendValue)) {
+//                        执行重发策略
+//                            gatt.writeCharacteristic(characteristic);
+//                        }
+
+        }
+
+        @Override
+        public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic,
+                                         int status) {
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                // 读取数据
+//                            BluetoothGattService service = gattt.getService(SERVICE_UUID);
+//                            BluetoothGattCharacteristic characteristic = gatt.getCharacteristic(CHARACTER_UUID);
+//                            gatt.readCharacteristic();
+                System.out.println("read value: " + characteristic.getValue());
+            }
+        }
+
+        @Override
+        /**
+         * 发现服务
+         * 真正建立了可通信的连接
+         *
+         */
+        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+
+            System.out.println("发现服务 >> " + gatt.getServices());
+
+        }
+
+        @Override
+        /**
+         * 成功连接到蓝牙设备
+         * gatt : 蓝牙设备的 Gatt 服务连接类
+         * status : 是否成功执行了连接操作，如果为
+         *          BluetoothGatt.GATT_SUCCESS 表示成功执行连接操作，
+         *          第三个参数才有效
+         *          status == 133 的情况，根据网上大部分人的说法，
+         *          这是因为 Android 最多支持连接 6 到 7 个左右的蓝牙设备，
+         *          如果超出了这个数量就无法再连接了。
+         *          所以当我们断开蓝牙设备的连接时，
+         *          还必须调用 BluetoothGatt#close 方法释放连接资源。
+         *          否则，在多次尝试连接蓝牙设备之后很快就会超出这一个限制，
+         *          导致出现这一个错误再也无法连接蓝牙设备。
+         * newState : 果 newState == BluetoothProfile.STATE_CONNECTED
+         *          说明设备已经连接
+         */
+        public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+            //Binder线程,拒绝耗时
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                if (newState == BluetoothProfile.STATE_CONNECTED) {
+                    gatt.discoverServices();
+                    System.out.println("连接成功");
+                } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                    System.out.println("连接关闭");
+                    gatt.close();
+                }
+            } else {
+                gatt.close();
+                System.out.println("连接失败");
+            }
+        }
+    };
 
     //监听 本地设备被其他设备发现 状态改变
     private class MyScanModeChanged extends BroadcastReceiver {
@@ -111,7 +183,8 @@ public class BleActivity extends BaseActivity {
     private BluetoothAdapter bluetoothAdapter;
     private BlueRvAdapter mAdapter;
     private ArrayList<ArrayList<BluetoothGattCharacteristic>> mGattCharacteristics;
-    private String uuid;
+
+    private MyScanModeChanged myScanModeChanged;
 
     @Override
     protected int getLayoutID() {
@@ -208,7 +281,11 @@ public class BleActivity extends BaseActivity {
         if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
             Toast.makeText(this, "该设备不支持蓝牙功能或蓝牙未开启", Toast.LENGTH_LONG)
                     .show();
-            //尝试打开蓝牙
+            //偷偷开启蓝牙
+//            if (bluetoothAdapter != null) {
+//                bluetoothAdapter.enable();
+//            }
+            //隐式启动activity 尝试打开蓝牙
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
             return false;
@@ -237,79 +314,8 @@ public class BleActivity extends BaseActivity {
                 BluetoothDevice device = devices.get(position);
                 System.out.println("开始连接 >> " + device.getAddress());
                 //进行蓝牙连接
-                device.connectGatt(BleActivity.this, false, new BluetoothGattCallback() {
+                BluetoothGatt gatt = device.connectGatt(BleActivity.this, false, bluetoothGattCallback);
 
-                    @Override
-                    public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-//往蓝牙数据通道的写入数据
-//                        BluetoothGattService service = gatt.getService(SERVICE_UUID);
-//                        BluetoothGattCharacteristic characteristic = gatt.getCharacteristic(CHARACTER_UUID);
-//                        characteristic.setValue(sendValue);
-//                        gatt.writeCharacteristic(characteristic);
-//                        if (!characteristic.getValue().equal(sendValue)) {
-//                        执行重发策略
-//                            gatt.writeCharacteristic(characteristic);
-//                        }
-
-                    }
-
-                    @Override
-                    public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic,
-                                                     int status) {
-                        if (status == BluetoothGatt.GATT_SUCCESS) {
-                            // 读取数据
-//                            BluetoothGattService service = gattt.getService(SERVICE_UUID);
-//                            BluetoothGattCharacteristic characteristic = gatt.getCharacteristic(CHARACTER_UUID);
-//                            gatt.readCharacteristic();
-                            System.out.println("read value: " + characteristic.getValue());
-                        }
-                    }
-
-                    @Override
-                    /**
-                     * 发现服务
-                     * 真正建立了可通信的连接
-                     *
-                     */
-                    public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-
-                        System.out.println("发现服务 >> " + gatt.getServices());
-
-                    }
-
-                    @Override
-                    /**
-                     * 成功连接到蓝牙设备
-                     * gatt : 蓝牙设备的 Gatt 服务连接类
-                     * status : 是否成功执行了连接操作，如果为
-                     *          BluetoothGatt.GATT_SUCCESS 表示成功执行连接操作，
-                     *          第三个参数才有效
-                     *          status == 133 的情况，根据网上大部分人的说法，
-                     *          这是因为 Android 最多支持连接 6 到 7 个左右的蓝牙设备，
-                     *          如果超出了这个数量就无法再连接了。
-                     *          所以当我们断开蓝牙设备的连接时，
-                     *          还必须调用 BluetoothGatt#close 方法释放连接资源。
-                     *          否则，在多次尝试连接蓝牙设备之后很快就会超出这一个限制，
-                     *          导致出现这一个错误再也无法连接蓝牙设备。
-                     * newState : 果 newState == BluetoothProfile.STATE_CONNECTED
-                     *          说明设备已经连接
-                     */
-                    public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-                        //Binder线程,拒绝耗时
-                        if (status == BluetoothGatt.GATT_SUCCESS) {
-                            if (newState == BluetoothProfile.STATE_CONNECTED) {
-                                gatt.discoverServices();
-                                System.out.println("连接成功");
-                            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                                System.out.println("连接关闭");
-                                gatt.close();
-                            }
-                        } else {
-                            gatt.close();
-                            System.out.println("连接失败");
-                        }
-                    }
-                });
 
             }
         });
