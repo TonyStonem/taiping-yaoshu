@@ -8,6 +8,7 @@ import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
+import android.bluetooth.BluetoothSocket;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
@@ -38,6 +39,7 @@ import java.util.Set;
 import butterknife.BindView;
 import xjw.app.hencoder.R;
 import xjw.app.hencoder.base.BaseActivity;
+import xjw.app.hencoder.module.view.ble.server.AcceptThread;
 import xjw.app.hencoder.utils.UIUtils;
 
 public class BleActivity extends BaseActivity {
@@ -202,6 +204,16 @@ public class BleActivity extends BaseActivity {
         //TODO 注册监听蓝牙可被检测的广播
 //        IntentFilter filter = new IntentFilter();
 //        registerReceiver(myScanModeChanged, filter);
+
+        //TODO 注册一个服务端的端口监听
+        new AcceptThread(new AcceptThread.onResponce() {
+            @Override
+            public void onSuccess(BluetoothSocket socket) {
+                //TODO 通过socket读写数据
+
+
+            }
+        }).start();
     }
 
     private void startScan() {

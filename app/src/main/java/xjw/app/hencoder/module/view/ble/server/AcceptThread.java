@@ -1,10 +1,11 @@
-package xjw.app.hencoder.module.view.ble;
+package xjw.app.hencoder.module.view.ble.server;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.UUID;
 
 /**
@@ -18,13 +19,27 @@ import java.util.UUID;
 
 public class AcceptThread extends Thread {
 
+    private OutputStream mOutSocket;
+
+    public interface onResponce {
+        void onSuccess(BluetoothSocket bluetoothSocket);
+    }
+
+    private onResponce mResponce;
+
     private final BluetoothServerSocket mServerSocket;
 
-    public AcceptThread(BluetoothAdapter adapter, String name, UUID uuid) {
+    private final static String mName = "XJWStudioBluetoothChart";
+    private final static UUID mUUID = UUID.randomUUID();
+
+    public AcceptThread(onResponce responce) {
+        mResponce = responce;
         BluetoothServerSocket tmp = null;
         try {
+            //TODO Bluetooth&GPS权限检测
             //获得一个BluetoothServerSocket对象
-            tmp = adapter.listenUsingRfcommWithServiceRecord(name, uuid);
+            tmp = BluetoothAdapter.getDefaultAdapter().
+                    listenUsingRfcommWithServiceRecord(mName, mUUID);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -40,18 +55,18 @@ public class AcceptThread extends Thread {
                 socket = mServerSocket.accept();
             } catch (IOException e) {
                 e.printStackTrace();
-                break;
+                System.out.println("error >> socket = mServerSocket.accept()");
+                return;
             }
             //此时socket已经连接好了,客户端不应该呼叫connect()
             if (socket != null) {
-                //TODO 将socket回调
+                mResponce.onSuccess(socket);
                 cancel();
-                break;
             }
         }
     }
 
-    public void cancel() {
+    private void cancel() {
         try {
             //释放server socket和它的资源,但不会关闭accept()返回的连接好的BluetoothSocket对象
             mServerSocket.close();
