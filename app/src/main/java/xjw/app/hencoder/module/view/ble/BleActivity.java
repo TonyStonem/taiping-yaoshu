@@ -46,7 +46,7 @@ public class BleActivity extends BaseActivity {
 
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-//往蓝牙数据通道的写入数据
+            //往蓝牙数据通道的写入数据
 //                        BluetoothGattService service = gatt.getService(SERVICE_UUID);
 //                        BluetoothGattCharacteristic characteristic = gatt.getCharacteristic(CHARACTER_UUID);
 //                        characteristic.setValue(sendValue);
@@ -77,9 +77,7 @@ public class BleActivity extends BaseActivity {
          *
          */
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-
             System.out.println("发现服务 >> " + gatt.getServices());
-
         }
 
         @Override
@@ -206,11 +204,6 @@ public class BleActivity extends BaseActivity {
 //        registerReceiver(myScanModeChanged, filter);
     }
 
-    private void useScan() {
-        canScan = true;
-        blueScan();
-    }
-
     private void startScan() {
         if (checkUsedGPS()) {
             if (checkUsedBleAndIsOpen()) blueScan();
@@ -242,10 +235,12 @@ public class BleActivity extends BaseActivity {
             }
             if (Build.VERSION.SDK_INT <= 22) {
                 bluetoothAdapter.startLeScan(scanCallback);
+                System.out.println("start scan. <= 22");
             } else {
                 BluetoothLeScanner scanner =
                         bluetoothAdapter.getBluetoothLeScanner();
                 scanner.startScan(scanCallbackMax);
+                System.out.println("start scan. > 22");
             }
             //已配对的设备
             Set<BluetoothDevice> set = bluetoothAdapter.getBondedDevices();
@@ -256,7 +251,6 @@ public class BleActivity extends BaseActivity {
                     System.out.println(dev.getName() + " >> " + dev.getAddress());
                 }
             }
-            System.out.println("start scan.");
             //15s后关闭扫描
             mHandler.sendEmptyMessageDelayed(0, 15 * 1000);
             return;
@@ -272,7 +266,6 @@ public class BleActivity extends BaseActivity {
             System.out.println("stop scan.");
         }
     }
-
     private boolean checkUsedBleAndIsOpen() {
         //TODO 权限检测
         //manager.getAdapter 内部其实还是BluetoothAdapter.getDefaultAdapter();
@@ -311,12 +304,14 @@ public class BleActivity extends BaseActivity {
                     UIUtils.showToast("查找设备中,请稍后");
                     return;
                 }
-                BluetoothDevice device = devices.get(position);
+                BluetoothDevice device = bluetoothAdapter.getRemoteDevice(devices.get(position).getAddress());
+                if (device == null) {
+                    System.out.println("不可连接 >> " + device.getAddress());
+                    return;
+                }
                 System.out.println("开始连接 >> " + device.getAddress());
                 //进行蓝牙连接
                 BluetoothGatt gatt = device.connectGatt(BleActivity.this, false, bluetoothGattCallback);
-
-
             }
         });
     }
@@ -324,9 +319,10 @@ public class BleActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         canScan = false;
-        if (myScanModeChanged != null) {
-            unregisterReceiver(myScanModeChanged);
-        }
+        //TODO 注意关闭
+//        if (myScanModeChanged != null) {
+//            unregisterReceiver(myScanModeChanged);
+//        }
         blueScan();
         super.onDestroy();
     }
