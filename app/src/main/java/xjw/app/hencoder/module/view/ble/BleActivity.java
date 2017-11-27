@@ -38,6 +38,7 @@ import java.util.Set;
 import butterknife.BindView;
 import xjw.app.hencoder.R;
 import xjw.app.hencoder.base.BaseActivity;
+import xjw.app.hencoder.utils.UIUtils;
 
 public class BleActivity extends BaseActivity {
 
@@ -228,6 +229,11 @@ public class BleActivity extends BaseActivity {
         rvContent.addOnItemTouchListener(new OnItemClickListener() {
             @Override
             public void onSimpleItemClick(BaseQuickAdapter adapter, View view, int position) {
+                if (canScan) {
+                    //调用connect()连接和查找设备不应同时进行,会造成连接尝试变慢或失败
+                    UIUtils.showToast("查找设备中,请稍后");
+                    return;
+                }
                 BluetoothDevice device = devices.get(position);
                 System.out.println("开始连接 >> " + device.getAddress());
                 //进行蓝牙连接
