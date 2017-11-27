@@ -195,7 +195,7 @@ public class BleActivity extends BaseActivity {
         startScan();
         //让本地设备被其他设备发现 如果此时Bluetooth没有启用 会自动开启Bluetooth
         Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-        intent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 0);
+        intent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
         startActivityForResult(intent, REQUEST_OPEN_BLE);
         myScanModeChanged = new MyScanModeChanged();
 

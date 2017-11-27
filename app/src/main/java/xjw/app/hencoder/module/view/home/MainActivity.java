@@ -21,11 +21,13 @@ import xjw.app.hencoder.module.view.laif.LaiFActivity;
 import xjw.app.hencoder.module.view.videos.VideoSaveActivity;
 import xjw.app.hencoder.utils.OkHttpManager;
 import xjw.app.hencoder.utils.UIUtils;
+import xjw.app.hencoder.whyhttp.WhyHttp;
 
 public class MainActivity extends BaseActivity {
 
     public static final String USERNAME = "xjwStudio";
     public static final String PASSWORD = "admin";
+    public static final String mSignIn = AllUrl.GET_SIGN_IN + USERNAME + "&pswd=" + PASSWORD;
 
     private View.OnClickListener myRvItemListener = new View.OnClickListener() {
         @Override
@@ -46,15 +48,27 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void start(Bundle savedInstanceState) {
-        signIn();
+        //TODO 更换自己的网络框架
+//        signIn();
+        signIn4WhyHttp();
         initData();
         initView();
     }
 
+    private void signIn4WhyHttp() {
+        String json = WhyHttp.create().get(mSignIn);
+        WhyHttp.create().get(mSignIn, new WhyHttp.OnResponse() {
+
+            @Override
+            public void onSuccess(String result) {
+
+            }
+        });
+    }
+
     private void signIn() {
         showLoadDias();
-        String url = AllUrl.GET_SIGN_IN + USERNAME + "&pswd=" + PASSWORD;
-        OkHttpManager.get(url
+        OkHttpManager.get(mSignIn
                 , this, new OkHttpManager.OnResponse<String>() {
                     @Override
                     public String analyseResult(String result) {
