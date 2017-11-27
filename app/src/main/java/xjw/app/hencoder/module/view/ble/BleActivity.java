@@ -14,7 +14,6 @@ import android.bluetooth.le.ScanResult;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -52,6 +51,17 @@ public class BleActivity extends BaseActivity {
 
         }
     }
+
+    private ScanCallback scanCallbackMax = new ScanCallback() {
+        @Override
+        public void onScanResult(int callbackType, ScanResult result) {
+            if (result.getDevice() != null) {
+                System.out.println("name >> " + result.getDevice().getName());
+                devices.add(result.getDevice());
+                mAdapter.notifyDataSetChanged();
+            }
+        }
+    };
 
     private BluetoothAdapter.LeScanCallback scanCallback = new BluetoothAdapter.LeScanCallback() {
 
@@ -99,16 +109,6 @@ public class BleActivity extends BaseActivity {
     RecyclerView rvContent;
     private BluetoothAdapter bluetoothAdapter;
     private BlueRvAdapter mAdapter;
-    private ScanCallback scanCallbackMax = new ScanCallback() {
-        @Override
-        public void onScanResult(int callbackType, ScanResult result) {
-            if (result.getDevice() != null) {
-                System.out.println("name >> " + result.getDevice().getName());
-                devices.add(result.getDevice());
-                mAdapter.notifyDataSetChanged();
-            }
-        }
-    };
     private ArrayList<ArrayList<BluetoothGattCharacteristic>> mGattCharacteristics;
     private String uuid;
 
@@ -127,9 +127,9 @@ public class BleActivity extends BaseActivity {
         startActivityForResult(intent, REQUEST_OPEN_BLE);
         myScanModeChanged = new MyScanModeChanged();
 
-        IntentFilter filter = new IntentFilter();
-
-        registerReceiver(myScanModeChanged, filter);
+        //TODO 注册监听蓝牙可被检测的广播
+//        IntentFilter filter = new IntentFilter();
+//        registerReceiver(myScanModeChanged, filter);
     }
 
     private void useScan() {
