@@ -1,6 +1,16 @@
 apply plugin: 'com.android.application'
+// App目录下build.gradle
+apply plugin: 'com.android.application'
+apply plugin: 'org.greenrobot.greendao' // apply plugin
 
 android {
+
+    greendao {
+        schemaVersion 1
+        daoPackage 'xjw.app.hencoder.db.gen'
+        targetGenDir 'src/main/java'
+    }
+
     compileSdkVersion 25
     buildToolsVersion "26.0.0"
     defaultConfig {
@@ -35,4 +45,5 @@ dependencies {
     compile 'com.orhanobut:logger:1.15'
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'com.laifeng:sopcast-sdk:1.0.4'
+    compile 'org.greenrobot:greendao:3.2.2' // add library
 }

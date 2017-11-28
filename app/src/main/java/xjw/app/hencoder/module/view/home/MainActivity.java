@@ -17,6 +17,7 @@ import xjw.app.hencoder.http.AllUrl;
 import xjw.app.hencoder.module.view.ble.BleSActivity;
 import xjw.app.hencoder.module.view.custom.CustomActivity;
 import xjw.app.hencoder.module.view.glide.GlidePlayActivity;
+import xjw.app.hencoder.module.view.greendao.GreenActivity;
 import xjw.app.hencoder.module.view.laif.LaiFActivity;
 import xjw.app.hencoder.module.view.videos.VideoSaveActivity;
 import xjw.app.hencoder.utils.OkHttpManager;
@@ -121,6 +122,9 @@ public class MainActivity extends BaseActivity {
         beanData.add(new MainRvBean("xjwLive",
                 "搞个直播玩玩,喵喵喵.",
                 "2017-11-20 10:02:08", "持续:1天", R.mipmap.img_06));
+        beanData.add(new MainRvBean("Green Play",
+                "当然是选择原谅她啦",
+                "2017-11-28 21:42:59", "持续:1天", R.mipmap.img_06));
     }
 
     private void check(int id, int tag) {
@@ -139,6 +143,9 @@ public class MainActivity extends BaseActivity {
                 break;
             case 5://直播
                 startActivity(new Intent(MainActivity.this, LaiFActivity.class));
+                break;
+            case 6://直播
+                startActivity(new Intent(MainActivity.this, GreenActivity.class));
                 break;
         }
     }

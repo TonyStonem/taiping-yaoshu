@@ -43,14 +43,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity android:name=".module.view.custom.CustomActivity" />
         <activity android:name=".module.view.ble.debug.BleActivity" />
         <activity android:name=".module.view.videos.VideoSaveActivity" />
         <activity android:name=".module.view.glide.GlidePlayActivity" />
         <activity android:name=".module.view.laif.LaiFActivity" />
-        <activity android:name=".module.view.ble.BleSActivity"/>
+        <activity android:name=".module.view.ble.BleSActivity" />
         <activity android:name=".module.view.ble.server.ServerActivity" />
+        <activity android:name=".module.view.greendao.GreenActivity"></activity>
     </application>
 
 </manifest>
