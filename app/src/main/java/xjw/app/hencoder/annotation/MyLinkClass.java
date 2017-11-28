@@ -1,4 +1,4 @@
-package xjw.app.hencoder.utils.annotation;
+package xjw.app.hencoder.annotation;
 
 /**
  * Created by xjw on 2017/9/4.

@@ -14,7 +14,7 @@ import butterknife.BindView;
 import xjw.app.hencoder.R;
 import xjw.app.hencoder.base.BaseActivity;
 import xjw.app.hencoder.http.AllUrl;
-import xjw.app.hencoder.module.view.ble.BleActivity;
+import xjw.app.hencoder.module.view.ble.BleSActivity;
 import xjw.app.hencoder.module.view.custom.CustomActivity;
 import xjw.app.hencoder.module.view.glide.GlidePlayActivity;
 import xjw.app.hencoder.module.view.laif.LaiFActivity;
@@ -129,7 +129,7 @@ public class MainActivity extends BaseActivity {
                 startActivity(new Intent(MainActivity.this, CustomActivity.class));
                 break;
             case 2://蓝牙
-                startActivity(new Intent(MainActivity.this, BleActivity.class));
+                startActivity(new Intent(MainActivity.this, BleSActivity.class));
                 break;
             case 3://视频录制
                 startActivity(new Intent(MainActivity.this, VideoSaveActivity.class));

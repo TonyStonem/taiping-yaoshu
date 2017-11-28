@@ -1,4 +1,4 @@
-package xjw.app.hencoder.module.view.ble;
+package xjw.app.hencoder.module.view.ble.debug;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
@@ -210,8 +210,7 @@ public class BleActivity extends BaseActivity {
             @Override
             public void onSuccess(BluetoothSocket socket) {
                 //TODO 通过socket读写数据
-
-
+                System.out.println(socket.getClass());
             }
         }).start();
     }
@@ -278,6 +277,7 @@ public class BleActivity extends BaseActivity {
             System.out.println("stop scan.");
         }
     }
+
     private boolean checkUsedBleAndIsOpen() {
         //TODO 权限检测
         //manager.getAdapter 内部其实还是BluetoothAdapter.getDefaultAdapter();
@@ -316,14 +316,16 @@ public class BleActivity extends BaseActivity {
                     UIUtils.showToast("查找设备中,请稍后");
                     return;
                 }
-                BluetoothDevice device = bluetoothAdapter.getRemoteDevice(devices.get(position).getAddress());
+                BluetoothDevice device = bluetoothAdapter
+                        .getRemoteDevice(devices.get(position).getAddress());
                 if (device == null) {
                     System.out.println("不可连接 >> " + device.getAddress());
                     return;
                 }
                 System.out.println("开始连接 >> " + device.getAddress());
                 //进行蓝牙连接
-                BluetoothGatt gatt = device.connectGatt(BleActivity.this, false, bluetoothGattCallback);
+                BluetoothGatt gatt = device.connectGatt(BleActivity.this,
+                        false, bluetoothGattCallback);
             }
         });
     }

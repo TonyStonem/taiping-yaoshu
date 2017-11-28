@@ -1,4 +1,4 @@
-package xjw.app.hencoder.module.view.ble;
+package xjw.app.hencoder.module.view.ble.debug;
 
 import android.bluetooth.BluetoothDevice;
 

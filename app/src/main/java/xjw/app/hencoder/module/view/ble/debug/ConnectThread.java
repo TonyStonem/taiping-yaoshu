@@ -1,4 +1,4 @@
-package xjw.app.hencoder.module.view.ble;
+package xjw.app.hencoder.module.view.ble.debug;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -18,17 +18,20 @@ public class ConnectThread extends Thread {
     private final BluetoothSocket mSocket;
     private final BluetoothDevice mDevice;
 
-    public ConnectThread(BluetoothAdapter adapter, BluetoothDevice device, UUID uuid) {
+    //    private final static UUID mUUID = UUID.randomUUID();
+    private final static UUID mUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+
+    public ConnectThread(BluetoothDevice device) {
         mDevice = device;
         BluetoothSocket tmp = null;
-
         try {
-            tmp = device.createRfcommSocketToServiceRecord(uuid);
+            tmp = device.createRfcommSocketToServiceRecord(mUUID);
         } catch (IOException e) {
             e.printStackTrace();
         }
         mSocket = tmp;
-        adapter.cancelDiscovery();
+        //TODO Bluetooth & GPS权限检测
+        BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
     }
 
     @Override

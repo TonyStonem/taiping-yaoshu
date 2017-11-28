@@ -30,13 +30,14 @@ public class AcceptThread extends Thread {
     private final BluetoothServerSocket mServerSocket;
 
     private final static String mName = "XJWStudioBluetoothChart";
-    private final static UUID mUUID = UUID.randomUUID();
+    //    private final static UUID mUUID = UUID.randomUUID();
+    private final static UUID mUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     public AcceptThread(onResponce responce) {
         mResponce = responce;
         BluetoothServerSocket tmp = null;
         try {
-            //TODO Bluetooth&GPS权限检测
+            //TODO Bluetooth & GPS权限检测
             //获得一个BluetoothServerSocket对象
             tmp = BluetoothAdapter.getDefaultAdapter().
                     listenUsingRfcommWithServiceRecord(mName, mUUID);

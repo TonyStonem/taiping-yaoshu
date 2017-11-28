@@ -1,4 +1,4 @@
-package xjw.app.hencoder.utils.annotation;
+package xjw.app.hencoder.annotation;
 
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;

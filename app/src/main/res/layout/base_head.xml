@@ -8,11 +8,13 @@
     android:layout_height="@dimen/dp46">
 
     <ImageView
+        android:src="@mipmap/ic_launcher"
         android:id="@+id/iv_head"
         android:layout_width="@dimen/dp17"
         android:layout_height="@dimen/dp17" />
 
     <TextView
+        android:text="TITLE"
         android:layout_marginLeft="@dimen/dp9"
         android:id="@+id/tv_title"
         android:textColor="@color/color_FFFFFF"

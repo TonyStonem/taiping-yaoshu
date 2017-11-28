@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="xjw.app.hencoder.module.view.ble.BleActivity">
+    tools:context="xjw.app.hencoder.module.view.ble.debug.BleActivity">
 
     <include layout="@layout/base_head" />
 
