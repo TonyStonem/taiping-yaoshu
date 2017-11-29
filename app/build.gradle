@@ -5,6 +5,12 @@ apply plugin: 'org.greenrobot.greendao' // apply plugin
 
 android {
 
+    sourceSets {
+        main {
+            java.srcDirs = ['src/main/java', 'src/main/aidl']
+        }
+    }
+
     greendao {
         schemaVersion 1
         daoPackage 'xjw.app.hencoder.db.gen'

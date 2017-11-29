@@ -50,7 +50,18 @@
         <activity android:name=".module.view.laif.LaiFActivity" />
         <activity android:name=".module.view.ble.BleSActivity" />
         <activity android:name=".module.view.ble.server.ServerActivity" />
-        <activity android:name=".module.view.greendao.GreenActivity"></activity>
+        <activity android:name=".module.view.greendao.GreenActivity" />
+
+        <service android:name=".IHelloService"
+            android:process=":remote"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="xjw.app.aidl" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>
