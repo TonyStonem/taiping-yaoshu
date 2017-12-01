@@ -38,7 +38,7 @@ public class MainActivity extends BaseActivity {
     };
 
     @BindView(R.id.rv_content)
-    RecyclerView rvContent;
+     RecyclerView rvContent;
     private List<MainRvBean> beanData = new ArrayList<>();
     private MainRvAdapter mAdapter;
 
@@ -49,6 +49,8 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void start(Bundle savedInstanceState) {
+        //TODO 插件化开发
+//        java.lang.ClassLoader
         //TODO 更换自己的网络框架
 //        signIn();
         signIn4WhyHttp();
