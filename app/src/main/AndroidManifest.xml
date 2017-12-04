@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="xjw.app.hencoder">
+    package="xjw.app.hencoder"
+    android:sharedUserId="cn.xjw.mApp">
 
     <!-- 来疯安卓sdk -->
     <uses-permission android:name="android.permission.CAMERA" />
