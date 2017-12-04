@@ -1,5 +1,6 @@
 package cn.xjw.tdex;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
@@ -11,6 +12,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -24,9 +26,21 @@ import dalvik.system.PathClassLoader;
 
 public class MainActivity extends AppCompatActivity {
 
+    private View.OnClickListener tvClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+            //TODO 注释
+            loadApk();
+
+
+        }
+    };
+
     private static final String M_SUI = "cn.xjw.mApp";
     private RelativeLayout rlMain;
     private TextView tv;
+    private String apkPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,9 +48,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         rlMain = (RelativeLayout) findViewById(R.id.activity_main);
         tv = (TextView) findViewById(R.id.tv);
+        tv.setOnClickListener(tvClickListener);
         tDex("dex_toast");
         tPApk();
-        String apkPath = Environment.getExternalStorageDirectory().getAbsolutePath()
+        apkPath = Environment.getExternalStorageDirectory().getAbsolutePath()
                 + File.separator + "tdexapk-plugin.apk";
         tDApk(apkPath, "dex_apkplugin", "test");
     }
@@ -180,6 +195,31 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
+    private void loadApk() {
+        try {
+            String[] info = findUNAPKInfo(apkPath);
+            File dir = getDir("dex_apkload", MODE_PRIVATE);
+            DexClassLoader loader = new DexClassLoader(apkPath, dir.getAbsolutePath(),
+                    null, ClassLoader.getSystemClassLoader());
+            PackageInfo pi = getPackageManager().getPackageArchiveInfo(apkPath, PackageManager.GET_ACTIVITIES);
+            if (pi != null && pi.activities != null && pi.activities.length > 0) {
+                Class<?> cls = loader.loadClass(pi.activities[0].name);
+                Object instance = cls.newInstance();
+                Method mSet = cls.getDeclaredMethod("setActivity", Activity.class);
+                mSet.setAccessible(true);
+                mSet.invoke(instance, this);
+                Bundle bundle = new Bundle();
+                bundle.putBoolean("mFlag", true);
+                Method mOnCreate = cls.getDeclaredMethod("onCreate", Bundle.class);
+                mOnCreate.setAccessible(true);
+                mOnCreate.invoke(instance, bundle);
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
 
 }
 

@@ -11,7 +11,7 @@
     tools:context="cn.xjw.tdx_plugin.MainActivity">
 
     <ImageView
-        android:src="@mipmap/ic_launcher"
+        android:src="@mipmap/test"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Hello World!" />
