@@ -1,11 +1,15 @@
 package xjw.app.hencoder.module.view.home;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +42,7 @@ public class MainActivity extends BaseActivity {
     };
 
     @BindView(R.id.rv_content)
-     RecyclerView rvContent;
+    RecyclerView rvContent;
     private List<MainRvBean> beanData = new ArrayList<>();
     private MainRvAdapter mAdapter;
 
@@ -49,6 +53,40 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void start(Bundle savedInstanceState) {
+        initTopAction();
+        mStart();
+    }
+
+    private void initTopAction() {
+        final LinearLayout llTop = (LinearLayout) findViewById(R.id.ll_top);
+        llTop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Snackbar.make(llTop, "搞乜嘢", 3500)
+                        .setAction("确定", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Toast.makeText(MainActivity.this, "action.", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .addCallback(new Snackbar.Callback(){
+                            @Override
+                            public void onShown(Snackbar sb) {
+                                Toast.makeText(MainActivity.this, "showing.", Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onDismissed(Snackbar transientBottomBar, int event) {
+                                Toast.makeText(MainActivity.this, "dismissing.", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .setActionTextColor(Color.parseColor("#FFFFFF"))
+                        .show();
+            }
+        });
+    }
+
+    private void mStart() {
         //TODO 插件化开发
 //        java.lang.ClassLoader
         //TODO 更换自己的网络框架

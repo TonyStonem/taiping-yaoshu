@@ -9,6 +9,7 @@
     tools:context="xjw.app.hencoder.module.view.home.MainActivity">
 
     <LinearLayout
+        android:id="@+id/ll_top"
         android:layout_width="match_parent"
         android:layout_height="@dimen/dp46"
         android:background="@color/colorPrimary"
